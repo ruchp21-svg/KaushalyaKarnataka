@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Kaushalya Karnataka</string>
+    <string name="search_hint">Search for professionals...</string>
+    <string name="all_categories">All</string>
+    <string name="category_plumber">Plumber</string>
+    <string name="category_electrician">Electrician</string>
+    <string name="category_tailor">Tailor</string>
+    <string name="category_cook">Cook</string>
+    <string name="hire_me">Hire Me</string>
+    <string name="professional_service">Professional Service</string>
+    <string name="reviews">Reviews</string>
+    <string name="jobs_completed">Jobs Completed</string>
+    <string name="rating">Rating</string>
+    <string name="services_offered">Services Offered</string>
+    <string name="work_gallery">Work Gallery</string>
+    <string name="review_wall">Review Wall</string>
+    <string name="register_expert">Register as Expert</string>
+    <string name="full_name">Full Name</string>
+    <string name="primary_skill">Primary Skill</string>
+    <string name="service_area">Service Area</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="system_overview">System Overview</string>
+    <string name="push_notifications">Push Notifications</string>
+    <string name="language_selection">Language Selection</string>
+    <string name="account_security">Account Security</string>
+    <string name="start_business">Start Business</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
+</resources>
