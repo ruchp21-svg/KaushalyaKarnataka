@@ -7,10 +7,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.kaushalyakarnataka.ui.auth.LoginScreen
 import com.example.kaushalyakarnataka.ui.home.HomeScreen
 import com.example.kaushalyakarnataka.ui.profile.ProfileScreen
 import com.example.kaushalyakarnataka.ui.registration.RegistrationScreen
 import com.example.kaushalyakarnataka.ui.settings.SettingsScreen
+import com.example.kaushalyakarnataka.ui.splash.SplashScreen
 import com.example.kaushalyakarnataka.ui.viewmodel.MainViewModel
 
 @Composable
@@ -20,20 +22,37 @@ fun NavGraph(navController: NavHostController) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val favoriteWorkerIds by viewModel.favoriteWorkerIds.collectAsState()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") {
+            SplashScreen(onNavigateNext = {
+                navController.navigate("login") {
+                    popUpTo("splash") { inclusive = true }
+                }
+            })
+        }
+        
+        composable("login") {
+            LoginScreen(onLoginSuccess = {
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
+            })
+        }
+
         composable("home") {
             HomeScreen(
                 workers = workers.filter { it.name.contains(searchQuery, ignoreCase = true) || it.role.contains(searchQuery, ignoreCase = true) },
                 searchQuery = searchQuery,
                 favoriteWorkerIds = favoriteWorkerIds,
-                onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+                onSearchQueryChange = { query -> viewModel.updateSearchQuery(query) },
                 onWorkerClick = { worker -> navController.navigate("profile/${worker.id}") },
                 onToggleLanguage = { viewModel.toggleLanguage() },
                 onRegisterClick = { navController.navigate("registration") },
                 onSettingsClick = { navController.navigate("settings") },
-                onToggleFavorite = { viewModel.toggleFavorite(it) }
+                onToggleFavorite = { workerId -> viewModel.toggleFavorite(workerId) }
             )
         }
+        
         composable("profile/{workerId}") { backStackEntry ->
             val workerId = backStackEntry.arguments?.getString("workerId")
             val worker = workers.find { it.id == workerId }
@@ -46,9 +65,11 @@ fun NavGraph(navController: NavHostController) {
                 )
             }
         }
+        
         composable("registration") {
             RegistrationScreen(onBackClick = { navController.popBackStack() })
         }
+
         composable("settings") {
             SettingsScreen(onBackClick = { navController.popBackStack() })
         }

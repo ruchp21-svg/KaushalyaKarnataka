@@ -57,7 +57,7 @@ fun SettingsScreen(onBackClick: () -> Unit) {
                 }
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             SettingsItem(
                 icon = Icons.Default.Security,
@@ -65,7 +65,7 @@ fun SettingsScreen(onBackClick: () -> Unit) {
                 onClick = { /* Handle navigation or action */ }
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             SettingsItem(
                 icon = Icons.Default.Info,

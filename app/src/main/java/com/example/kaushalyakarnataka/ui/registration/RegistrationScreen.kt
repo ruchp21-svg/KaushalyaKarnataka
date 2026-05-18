@@ -1,15 +1,21 @@
 package com.example.kaushalyakarnataka.ui.registration
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kaushalyakarnataka.R
+import com.example.kaushalyakarnataka.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,56 +28,64 @@ fun RegistrationScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.register_expert)) },
+                title = { Text(stringResource(R.string.register_expert), fontWeight = FontWeight.SemiBold, fontSize = 17.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        // Icon would go here
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextPrimary)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceWhite),
+                modifier = Modifier.drawBehindBorder()
             )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(16.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(BackgroundOffWhite)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text(stringResource(R.string.full_name)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = skill,
-                onValueChange = { skill = it },
-                label = { Text(stringResource(R.string.primary_skill)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = area,
-                onValueChange = { area = it },
-                label = { Text(stringResource(R.string.service_area)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text(stringResource(R.string.phone_number)) },
-                modifier = Modifier.fillMaxWidth()
-            )
+            RegistrationField(label = stringResource(R.string.full_name), value = name, onValueChange = { name = it })
+            RegistrationField(label = stringResource(R.string.primary_skill), value = skill, onValueChange = { skill = it })
+            RegistrationField(label = stringResource(R.string.service_area), value = area, onValueChange = { area = it })
+            RegistrationField(label = stringResource(R.string.phone_number), value = phone, onValueChange = { phone = it })
+            
             Spacer(modifier = Modifier.weight(1f))
+            
             Button(
                 onClick = { /* Handle registration */ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
+                    .height(52.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
+                elevation = ButtonDefaults.buttonElevation(0.dp)
             ) {
-                Text(stringResource(R.string.register_expert), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.register_expert), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }
 }
+
+@Composable
+fun RegistrationField(label: String, value: String, onValueChange: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = label, fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color(0xFFF5F5F5),
+                focusedContainerColor = Color(0xFFF5F5F5),
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
+            ),
+            singleLine = true
+        )
+    }
+}
+
+private fun Modifier.drawBehindBorder() = this.padding(bottom = 1.dp).background(BorderLight).padding(bottom = (-1).dp)

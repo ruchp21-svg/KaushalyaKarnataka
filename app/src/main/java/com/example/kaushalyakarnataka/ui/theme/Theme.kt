@@ -14,8 +14,6 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryOrange,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
     background = Color(0xFF121212),
     surface = Color(0xFF1E1E1E),
     onPrimary = Color.Black,
@@ -26,12 +24,14 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryOrange,
     onPrimary = Color.White,
-    background = BackgroundLight,
+    background = BackgroundOffWhite,
     surface = SurfaceWhite,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    onBackground = TextPrimary,
+    onSurface = TextPrimary,
+    outline = BorderLight,
+    secondary = TextSecondary,
+    tertiary = SuccessGreen,
+    surfaceVariant = AccentOrangeLight
 )
 
 @Composable
@@ -44,8 +44,9 @@ fun KaushalyaKarnatakaTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.surface.toArgb()
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = !darkTheme
         }
     }
 

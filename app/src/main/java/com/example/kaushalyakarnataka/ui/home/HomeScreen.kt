@@ -3,15 +3,18 @@ package com.example.kaushalyakarnataka.ui.home
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,12 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kaushalyakarnataka.R
 import com.example.kaushalyakarnataka.data.Worker
-import com.example.kaushalyakarnataka.ui.theme.KaushalyaKarnatakaTheme
+import com.example.kaushalyakarnataka.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,31 +41,37 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     onToggleFavorite: (String) -> Unit
 ) {
+    var selectedCategory by remember { mutableStateOf("All") }
+    val categories = listOf("All", "Plumber", "Electrician", "Tailor", "Cook")
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
                 actions = {
                     IconButton(onClick = onToggleLanguage) {
-                        Icon(Icons.Default.Language, contentDescription = "Language", tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(Icons.Default.Language, contentDescription = "Language", tint = TextPrimary)
                     }
                     IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(Icons.Default.Settings, contentDescription = "Settings", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    containerColor = SurfaceWhite,
+                    titleContentColor = TextPrimary
+                ),
+                modifier = Modifier.drawBehindBorder()
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onRegisterClick,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = PrimaryOrange,
+                contentColor = Color.White,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.start_business)) }
+                text = { Text(stringResource(R.string.start_business), fontWeight = FontWeight.Medium) },
+                shape = RoundedCornerShape(24.dp),
+                elevation = FloatingActionButtonDefaults.elevation(0.dp)
             )
         }
     ) { paddingValues ->
@@ -71,29 +79,62 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(BackgroundOffWhite)
         ) {
+            // Search Bar
             TextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChange,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                placeholder = { Text(stringResource(R.string.search_hint)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    .clip(RoundedCornerShape(14.dp)),
+                placeholder = { Text("Search electricians, plumbers...", color = Color(0xFF9CA3AF), fontSize = 13.sp) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface
-                )
+                    unfocusedContainerColor = Color(0xFFF5F5F5),
+                    focusedContainerColor = Color(0xFFF5F5F5),
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                ),
+                singleLine = true
             )
 
+            // Filter Chips
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                items(categories) { category ->
+                    val isSelected = selectedCategory == category
+                    Surface(
+                        onClick = { selectedCategory = category },
+                        shape = RoundedCornerShape(20.dp),
+                        color = if (isSelected) PrimaryOrange else Color(0xFFF5F5F5),
+                        contentColor = if (isSelected) Color.White else TextSecondary
+                    ) {
+                        Text(
+                            text = category,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+
+            // Worker List
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(workers) { worker ->
+                val filteredWorkers = workers.filter {
+                    (it.name.contains(searchQuery, ignoreCase = true) || it.role.contains(searchQuery, ignoreCase = true)) &&
+                    (selectedCategory == "All" || it.role == selectedCategory)
+                }
+                items(filteredWorkers) { worker ->
                     WorkerCard(
                         worker = worker,
                         isFavorite = favoriteWorkerIds.contains(worker.id),
@@ -114,99 +155,99 @@ fun WorkerCard(
     onToggleFavorite: () -> Unit
 ) {
     val context = LocalContext.current
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onWorkerClick(worker) },
-        shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .clickable { onWorkerClick(worker) }
+            .border(1.dp, BorderLight, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        color = SurfaceWhite
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Avatar
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primary),
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(AccentOrangeLight),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = worker.initials,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    color = PrimaryOrange,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = worker.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(text = worker.name, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = TextPrimary)
                     if (worker.isVerified) {
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             Icons.Default.Verified,
                             contentDescription = "Verified",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(16.dp)
+                            tint = SuccessGreen,
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
-                Text(text = worker.role, color = Color.Gray)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = Color.Gray
+                
+                // Role Badge
+                Surface(
+                    color = AccentOrangeLight,
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text(
+                        text = worker.role,
+                        color = PrimaryOrange,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                     )
-                    Text(text = worker.location, color = Color.Gray, fontSize = 14.sp)
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text(text = "📍 ${worker.location}", color = TextSecondary, fontSize = 12.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.Default.Star, contentDescription = null, tint = StarYellow, modifier = Modifier.size(12.dp))
+                    Text(text = " ${worker.rating}", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 }
             }
             
-            IconButton(onClick = onToggleFavorite) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = if (isFavorite) Color.Red else Color.Gray
-                )
-            }
-            
-            IconButton(onClick = {
-                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${worker.phone}"))
-                context.startActivity(intent)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Call,
-                    contentDescription = "Quick Call",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            Column(horizontalAlignment = Alignment.End) {
+                IconButton(onClick = onToggleFavorite, modifier = Modifier.size(24.dp)) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = if (isFavorite) Color.Red else TextSecondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                IconButton(onClick = {
+                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${worker.phone}"))
+                    context.startActivity(intent)
+                }, modifier = Modifier.size(24.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Call,
+                        contentDescription = "Quick Call",
+                        tint = PrimaryOrange,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    KaushalyaKarnatakaTheme {
-        HomeScreen(
-            workers = listOf(
-                Worker(id = "1", name = "Ramesh Kumar", role = "Plumber", location = "Bengaluru", initials = "RK", isVerified = true, rating = 4.8, reviewsCount = 120)
-            ),
-            searchQuery = "",
-            favoriteWorkerIds = emptySet(),
-            onSearchQueryChange = {},
-            onWorkerClick = {},
-            onToggleLanguage = {},
-            onRegisterClick = {},
-            onSettingsClick = {},
-            onToggleFavorite = {}
-        )
-    }
-}
-
+fun Modifier.drawBehindBorder() = this.padding(bottom = 1.dp).background(BorderLight).padding(bottom = (-1).dp)
