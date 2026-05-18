@@ -42,8 +42,14 @@ fun HomeScreen(
     onProfileClick: () -> Unit,
     onToggleFavorite: (String) -> Unit
 ) {
-    var selectedCategory by remember { mutableStateOf("All") }
-    val categories = listOf("All", "Plumber", "Electrician", "Tailor", "Cook")
+    var selectedCategoryKey by remember { mutableStateOf("All") }
+    val categories = listOf(
+        "All" to stringResource(R.string.all_categories),
+        "Plumber" to stringResource(R.string.category_plumber),
+        "Electrician" to stringResource(R.string.category_electrician),
+        "Tailor" to stringResource(R.string.category_tailor),
+        "Cook" to stringResource(R.string.category_cook)
+    )
 
     Scaffold(
         topBar = {
@@ -93,7 +99,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
                     .clip(RoundedCornerShape(14.dp)),
-                placeholder = { Text("Search experts...", color = Color(0xFF9CA3AF), fontSize = 13.sp) },
+                placeholder = { Text(stringResource(R.string.search_hint), color = Color(0xFF9CA3AF), fontSize = 13.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = TextPrimary,
@@ -113,16 +119,16 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(bottom = 8.dp)
             ) {
-                items(categories) { category ->
-                    val isSelected = selectedCategory == category
+                items(categories) { (key, label) ->
+                    val isSelected = selectedCategoryKey == key
                     Surface(
-                        onClick = { selectedCategory = category },
+                        onClick = { selectedCategoryKey = key },
                         shape = RoundedCornerShape(20.dp),
                         color = if (isSelected) PrimaryOrange else Color(0xFFF5F5F5),
                         contentColor = if (isSelected) Color.White else TextSecondary
                     ) {
                         Text(
-                            text = category,
+                            text = label,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
@@ -139,7 +145,7 @@ fun HomeScreen(
             ) {
                 val filteredWorkers = workers.filter {
                     (it.name.contains(searchQuery, ignoreCase = true) || it.role.contains(searchQuery, ignoreCase = true)) &&
-                    (selectedCategory == "All" || it.role == selectedCategory)
+                    (selectedCategoryKey == "All" || it.role == selectedCategoryKey)
                 }
                 items(filteredWorkers) { worker ->
                     WorkerCard(
@@ -153,6 +159,7 @@ fun HomeScreen(
         }
     }
 }
+
 
 @Composable
 fun WorkerCard(
