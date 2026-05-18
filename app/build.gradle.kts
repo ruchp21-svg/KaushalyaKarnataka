@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    // alias(libs.plugins.google.services) // Temporarily disabled until google-services.json is added
 }
 
 android {
     namespace = "com.example.kaushalyakarnataka"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.kaushalyakarnataka"
@@ -49,7 +48,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
     
-    // Firebase
+    // Firebase (kept but plugin disabled to allow build)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
