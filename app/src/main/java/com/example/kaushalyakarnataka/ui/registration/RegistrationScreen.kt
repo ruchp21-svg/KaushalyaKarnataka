@@ -31,7 +31,7 @@ fun RegistrationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.register_expert), fontWeight = FontWeight.SemiBold, fontSize = 17.sp) },
+                title = { Text(stringResource(R.string.register_expert), fontWeight = FontWeight.Bold, fontSize = 20.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextPrimary)
@@ -47,9 +47,17 @@ fun RegistrationScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .background(BackgroundOffWhite)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            Text(
+                text = "Professional Details",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextSecondary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
             RegistrationField(label = stringResource(R.string.full_name), value = name, onValueChange = { name = it })
             RegistrationField(label = stringResource(R.string.primary_skill), value = skill, onValueChange = { skill = it })
             RegistrationField(label = stringResource(R.string.service_area), value = area, onValueChange = { area = it })
@@ -66,12 +74,12 @@ fun RegistrationScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange),
                 elevation = ButtonDefaults.buttonElevation(0.dp)
             ) {
-                Text(stringResource(R.string.register_expert), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text("Create My Profile", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -80,11 +88,19 @@ fun RegistrationScreen(
 @Composable
 fun RegistrationField(label: String, value: String, onValueChange: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(text = label, fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = TextPrimary,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 4.dp)
+        )
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp)),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = TextPrimary,
                 unfocusedTextColor = TextPrimary,
@@ -92,9 +108,11 @@ fun RegistrationField(label: String, value: String, onValueChange: (String) -> U
                 unfocusedContainerColor = Color(0xFFF5F5F5),
                 focusedContainerColor = Color(0xFFF5F5F5),
                 unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent
+                focusedIndicatorColor = Color.Transparent,
+                focusedLabelColor = PrimaryOrange
             ),
-            singleLine = true
+            singleLine = true,
+            placeholder = { Text("Type here...", color = Color.LightGray, fontSize = 13.sp) }
         )
     }
 }

@@ -11,7 +11,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -119,6 +128,9 @@ fun ProfileScreen(
             items(worker.reviews) { review ->
                 ReviewItem(review.authorName, review.starRating, review.commentText)
             }
+            item {
+                Spacer(modifier = Modifier.height(100.dp))
+            }
         }
     }
 }
@@ -129,42 +141,60 @@ fun ProfileHeader(worker: Worker) {
         modifier = Modifier
             .fillMaxWidth()
             .background(SurfaceWhite)
-            .padding(16.dp),
+            .padding(top = 8.dp, bottom = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
-                .size(72.dp)
+                .size(100.dp)
                 .clip(CircleShape)
-                .border(2.dp, PrimaryOrange, CircleShape)
+                .border(3.dp, PrimaryOrange.copy(alpha = 0.1f), CircleShape)
                 .background(AccentOrangeLight),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = worker.initials,
                 color = PrimaryOrange,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold
             )
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(text = worker.name, color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-        Text(text = worker.role, color = PrimaryOrange, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-        Text(text = "📍 ${worker.location}", color = TextSecondary, fontSize = 13.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = worker.name,
+            color = TextPrimary,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = worker.role,
+            color = PrimaryOrange,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Icon(Icons.Default.LocationOn, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(14.dp))
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = worker.location, color = TextSecondary, fontSize = 13.sp)
+        }
         
         if (worker.isVerified) {
             Surface(
                 color = Color(0xFFECFDF5),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.padding(top = 8.dp)
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.padding(top = 16.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Shield, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Verified Worker", color = SuccessGreen, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Icon(Icons.Default.Verified, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = "Verified Professional", color = Color(0xFF065F46), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -176,29 +206,31 @@ fun StatsSection(worker: Worker) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        StatItem(worker.rating.toString(), stringResource(R.string.rating), Modifier.weight(1f))
-        StatItem(worker.reviewsCount.toString(), stringResource(R.string.reviews), Modifier.weight(1f))
-        StatItem(worker.jobsDone.toString(), stringResource(R.string.jobs_completed), Modifier.weight(1f))
+        StatItem(worker.rating.toString(), stringResource(R.string.rating), Icons.Default.Star, Modifier.weight(1f))
+        StatItem(worker.reviewsCount.toString(), stringResource(R.string.reviews), Icons.Default.ChatBubble, Modifier.weight(1f))
+        StatItem(worker.jobsDone.toString(), "Jobs", Icons.Default.Work, Modifier.weight(1f))
     }
 }
 
 @Composable
-fun StatItem(value: String, label: String, modifier: Modifier = Modifier) {
+fun StatItem(value: String, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
-        color = Color.White,
-        shape = RoundedCornerShape(12.dp),
+        color = SurfaceWhite,
+        shape = RoundedCornerShape(16.dp),
         border = borderStroke()
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 12.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = value, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = TextPrimary)
-            Text(text = label, color = TextSecondary, fontSize = 11.sp)
+            Icon(icon, contentDescription = null, tint = PrimaryOrange.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = value, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = TextPrimary)
+            Text(text = label, color = TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
