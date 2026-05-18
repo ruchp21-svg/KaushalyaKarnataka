@@ -89,7 +89,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
                     .clip(RoundedCornerShape(14.dp)),
-                placeholder = { Text("Search electricians, plumbers...", color = Color(0xFF9CA3AF), fontSize = 13.sp) },
+                placeholder = { Text("Search experts...", color = Color(0xFF9CA3AF), fontSize = 13.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color(0xFFF5F5F5),
@@ -163,87 +163,93 @@ fun WorkerCard(
         shape = RoundedCornerShape(16.dp),
         color = SurfaceWhite
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Avatar
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(AccentOrangeLight),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = worker.initials,
-                    color = PrimaryOrange,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            
-            Spacer(modifier = Modifier.width(12.dp))
-            
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = worker.name, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = TextPrimary)
-                    if (worker.isVerified) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(
-                            Icons.Default.Verified,
-                            contentDescription = "Verified",
-                            tint = SuccessGreen,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
-                
-                // Role Badge
-                Surface(
-                    color = AccentOrangeLight,
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.padding(top = 4.dp)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Avatar
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(AccentOrangeLight),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = worker.role,
+                        text = worker.initials,
                         color = PrimaryOrange,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Text(text = "📍 ${worker.location}", color = TextSecondary, fontSize = 12.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(Icons.Default.Star, contentDescription = null, tint = StarYellow, modifier = Modifier.size(12.dp))
-                    Text(text = " ${worker.rating}", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = worker.name, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = TextPrimary)
+                    // Role Badge
+                    Surface(
+                        color = PrimaryOrange,
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Text(
+                            text = worker.role,
+                            color = Color.White,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                    Text(text = "📍 ${worker.location}", color = TextSecondary, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                
+                Column(horizontalAlignment = Alignment.End) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Star, contentDescription = null, tint = StarYellow, modifier = Modifier.size(14.dp))
+                        Text(text = " ${worker.rating}", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                    }
+                    Text(text = "${worker.jobsDone} jobs", color = TextSecondary, fontSize = 11.sp)
                 }
             }
             
-            Column(horizontalAlignment = Alignment.End) {
-                IconButton(onClick = onToggleFavorite, modifier = Modifier.size(24.dp)) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = if (isFavorite) Color.Red else TextSecondary,
-                        modifier = Modifier.size(20.dp)
+            if (worker.isVerified) {
+                Surface(
+                    color = Color(0xFFDCFCE7),
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text(
+                        text = "✔ Verified Work",
+                        color = Color(0xFF15803D),
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        fontWeight = FontWeight.Medium
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                IconButton(onClick = {
-                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${worker.phone}"))
-                    context.startActivity(intent)
-                }, modifier = Modifier.size(24.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.Call,
-                        contentDescription = "Quick Call",
-                        tint = PrimaryOrange,
-                        modifier = Modifier.size(20.dp)
-                    )
+            }
+            
+            // Services Preview Tags
+            if (worker.services.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth()
+                        .drawTopBorder(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    worker.services.take(3).forEach { service ->
+                        Surface(
+                            color = Color(0xFFF8FAF4),
+                            border = androidx.compose.foundation.BorderStroke(0.5.dp, BorderLight),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Text(
+                                text = "${service.serviceName}: ${service.price}",
+                                color = TextSecondary,
+                                fontSize = 10.sp,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -251,3 +257,4 @@ fun WorkerCard(
 }
 
 fun Modifier.drawBehindBorder() = this.padding(bottom = 1.dp).background(BorderLight).padding(bottom = (-1).dp)
+fun Modifier.drawTopBorder() = this.padding(top = 1.dp).background(BorderLight).padding(top = (-1).dp)

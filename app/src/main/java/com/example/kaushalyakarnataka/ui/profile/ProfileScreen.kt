@@ -108,6 +108,12 @@ fun ProfileScreen(
                 ServiceItem(service.serviceName, service.price)
             }
             item {
+                SectionTitle("Work Photos")
+            }
+            item {
+                WorkPhotosGrid()
+            }
+            item {
                 SectionTitle(stringResource(R.string.review_wall))
             }
             items(worker.reviews) { review ->
@@ -158,7 +164,7 @@ fun ProfileHeader(worker: Worker) {
                 ) {
                     Icon(Icons.Default.Shield, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Verified", color = SuccessGreen, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text(text = "Verified Worker", color = SuccessGreen, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -193,6 +199,31 @@ fun StatItem(value: String, label: String, modifier: Modifier = Modifier) {
         ) {
             Text(text = value, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = TextPrimary)
             Text(text = label, color = TextSecondary, fontSize = 11.sp)
+        }
+    }
+}
+
+@Composable
+fun WorkPhotosGrid() {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        listOf("💡", "🔌", "⚡", "🔧").forEach { emoji ->
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f),
+                color = Color.White,
+                shape = RoundedCornerShape(8.dp),
+                border = borderStroke()
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(text = emoji, fontSize = 24.sp)
+                }
+            }
         }
     }
 }
