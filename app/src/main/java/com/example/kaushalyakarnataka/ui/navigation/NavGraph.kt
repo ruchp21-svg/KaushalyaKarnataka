@@ -7,7 +7,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.kaushalyakarnataka.ui.auth.LoginScreen
 import com.example.kaushalyakarnataka.ui.home.HomeScreen
 import com.example.kaushalyakarnataka.ui.profile.ProfileScreen
 import com.example.kaushalyakarnataka.ui.registration.RegistrationScreen
@@ -25,16 +24,8 @@ fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
             SplashScreen(onNavigateNext = {
-                navController.navigate("login") {
-                    popUpTo("splash") { inclusive = true }
-                }
-            })
-        }
-        
-        composable("login") {
-            LoginScreen(onLoginSuccess = {
                 navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
+                    popUpTo("splash") { inclusive = true }
                 }
             })
         }
