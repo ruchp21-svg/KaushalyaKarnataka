@@ -19,7 +19,10 @@ import com.example.kaushalyakarnataka.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(onBackClick: () -> Unit) {
+fun RegistrationScreen(
+    onBackClick: () -> Unit,
+    onRegister: (String, String, String, String) -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var skill by remember { mutableStateOf("") }
     var area by remember { mutableStateOf("") }
@@ -55,7 +58,12 @@ fun RegistrationScreen(onBackClick: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
             
             Button(
-                onClick = { /* Handle registration */ },
+                onClick = {
+                    if (name.isNotBlank() && skill.isNotBlank() && area.isNotBlank() && phone.isNotBlank()) {
+                        onRegister(name, skill, area, phone)
+                        onBackClick()
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -78,6 +86,9 @@ fun RegistrationField(label: String, value: String, onValueChange: (String) -> U
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
             colors = TextFieldDefaults.colors(
+                focusedTextColor = TextPrimary,
+                unfocusedTextColor = TextPrimary,
+                cursorColor = PrimaryOrange,
                 unfocusedContainerColor = Color(0xFFF5F5F5),
                 focusedContainerColor = Color(0xFFF5F5F5),
                 unfocusedIndicatorColor = Color.Transparent,

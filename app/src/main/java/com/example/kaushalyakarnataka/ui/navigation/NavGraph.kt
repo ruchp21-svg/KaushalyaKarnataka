@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.kaushalyakarnataka.ui.home.HomeScreen
 import com.example.kaushalyakarnataka.ui.profile.ProfileScreen
+import com.example.kaushalyakarnataka.ui.profile.UserProfileScreen
 import com.example.kaushalyakarnataka.ui.registration.RegistrationScreen
 import com.example.kaushalyakarnataka.ui.settings.SettingsScreen
 import com.example.kaushalyakarnataka.ui.splash.SplashScreen
@@ -32,7 +33,7 @@ fun NavGraph(navController: NavHostController) {
 
         composable("home") {
             HomeScreen(
-                workers = workers.filter { it.name.contains(searchQuery, ignoreCase = true) || it.role.contains(searchQuery, ignoreCase = true) },
+                workers = workers,
                 searchQuery = searchQuery,
                 favoriteWorkerIds = favoriteWorkerIds,
                 onSearchQueryChange = { query -> viewModel.updateSearchQuery(query) },
@@ -40,8 +41,13 @@ fun NavGraph(navController: NavHostController) {
                 onToggleLanguage = { viewModel.toggleLanguage() },
                 onRegisterClick = { navController.navigate("registration") },
                 onSettingsClick = { navController.navigate("settings") },
+                onProfileClick = { navController.navigate("user_profile") },
                 onToggleFavorite = { workerId -> viewModel.toggleFavorite(workerId) }
             )
+        }
+        
+        composable("user_profile") {
+            UserProfileScreen(onBackClick = { navController.popBackStack() })
         }
         
         composable("profile/{workerId}") { backStackEntry ->
@@ -58,7 +64,12 @@ fun NavGraph(navController: NavHostController) {
         }
         
         composable("registration") {
-            RegistrationScreen(onBackClick = { navController.popBackStack() })
+            RegistrationScreen(
+                onBackClick = { navController.popBackStack() },
+                onRegister = { name, skill, area, phone ->
+                    viewModel.addWorker(name, skill, area, phone)
+                }
+            )
         }
 
         composable("settings") {

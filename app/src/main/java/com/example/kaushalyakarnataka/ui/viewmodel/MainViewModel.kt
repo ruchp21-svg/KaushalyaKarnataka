@@ -82,6 +82,23 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun addWorker(name: String, role: String, location: String, phone: String) {
+        val initials = name.split(" ").filter { it.isNotEmpty() }.map { it[0] }.joinToString("").uppercase()
+        val newWorker = Worker(
+            id = (workers.value.size + 1).toString(),
+            name = name,
+            role = role,
+            location = location,
+            phone = phone,
+            initials = if (initials.length >= 2) initials.take(2) else initials,
+            rating = 0.0,
+            reviewsCount = 0,
+            jobsDone = 0,
+            isVerified = false
+        )
+        _workers.value = _workers.value + newWorker
+    }
+
     private fun getDummyWorkers() = listOf(
         Worker(
             id = "1", name = "Ramesh Kumar", role = "Plumber", location = "Bengaluru",

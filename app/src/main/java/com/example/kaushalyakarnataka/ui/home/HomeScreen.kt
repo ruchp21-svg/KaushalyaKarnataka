@@ -39,6 +39,7 @@ fun HomeScreen(
     onToggleLanguage: () -> Unit,
     onRegisterClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onProfileClick: () -> Unit,
     onToggleFavorite: (String) -> Unit
 ) {
     var selectedCategory by remember { mutableStateOf("All") }
@@ -51,6 +52,9 @@ fun HomeScreen(
                 actions = {
                     IconButton(onClick = onToggleLanguage) {
                         Icon(Icons.Default.Language, contentDescription = "Language", tint = TextPrimary)
+                    }
+                    IconButton(onClick = onProfileClick) {
+                        Icon(Icons.Default.AccountCircle, contentDescription = "Profile", tint = TextPrimary)
                     }
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, contentDescription = "Settings", tint = TextPrimary)
@@ -92,6 +96,9 @@ fun HomeScreen(
                 placeholder = { Text("Search experts...", color = Color(0xFF9CA3AF), fontSize = 13.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
                 colors = TextFieldDefaults.colors(
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary,
+                    cursorColor = PrimaryOrange,
                     unfocusedContainerColor = Color(0xFFF5F5F5),
                     focusedContainerColor = Color(0xFFF5F5F5),
                     unfocusedIndicatorColor = Color.Transparent,
