@@ -1,5 +1,7 @@
 package com.example.kaushalyakarnataka.ui.home
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,10 +31,13 @@ import com.example.kaushalyakarnataka.ui.theme.KaushalyaKarnatakaTheme
 fun HomeScreen(
     workers: List<Worker>,
     searchQuery: String,
+    favoriteWorkerIds: Set<String>,
     onSearchQueryChange: (String) -> Unit,
     onWorkerClick: (Worker) -> Unit,
     onToggleLanguage: () -> Unit,
     onRegisterClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onToggleFavorite: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -40,6 +46,9 @@ fun HomeScreen(
                 actions = {
                     IconButton(onClick = onToggleLanguage) {
                         Icon(Icons.Default.Language, contentDescription = "Language", tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -85,7 +94,12 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(workers) { worker ->
-                    WorkerCard(worker, onWorkerClick)
+                    WorkerCard(
+                        worker = worker,
+                        isFavorite = favoriteWorkerIds.contains(worker.id),
+                        onWorkerClick = onWorkerClick,
+                        onToggleFavorite = { onToggleFavorite(worker.id) }
+                    )
                 }
             }
         }
@@ -93,7 +107,13 @@ fun HomeScreen(
 }
 
 @Composable
-fun WorkerCard(worker: Worker, onWorkerClick: (Worker) -> Unit) {
+fun WorkerCard(
+    worker: Worker,
+    isFavorite: Boolean,
+    onWorkerClick: (Worker) -> Unit,
+    onToggleFavorite: () -> Unit
+) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,7 +143,7 @@ fun WorkerCard(worker: Worker, onWorkerClick: (Worker) -> Unit) {
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = worker.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     if (worker.isVerified) {
@@ -147,6 +167,25 @@ fun WorkerCard(worker: Worker, onWorkerClick: (Worker) -> Unit) {
                     Text(text = worker.location, color = Color.Gray, fontSize = 14.sp)
                 }
             }
+            
+            IconButton(onClick = onToggleFavorite) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = if (isFavorite) Color.Red else Color.Gray
+                )
+            }
+            
+            IconButton(onClick = {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${worker.phone}"))
+                context.startActivity(intent)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Call,
+                    contentDescription = "Quick Call",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
@@ -160,10 +199,14 @@ fun HomeScreenPreview() {
                 Worker(id = "1", name = "Ramesh Kumar", role = "Plumber", location = "Bengaluru", initials = "RK", isVerified = true, rating = 4.8, reviewsCount = 120)
             ),
             searchQuery = "",
+            favoriteWorkerIds = emptySet(),
             onSearchQueryChange = {},
             onWorkerClick = {},
             onToggleLanguage = {},
-            onRegisterClick = {}
+            onRegisterClick = {},
+            onSettingsClick = {},
+            onToggleFavorite = {}
         )
     }
 }
+

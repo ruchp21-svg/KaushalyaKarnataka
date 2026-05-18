@@ -18,6 +18,9 @@ class MainViewModel : ViewModel() {
     private val _currentLanguage = MutableStateFlow("en")
     val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
 
+    private val _favoriteWorkerIds = MutableStateFlow<Set<String>>(emptySet())
+    val favoriteWorkerIds: StateFlow<Set<String>> = _favoriteWorkerIds.asStateFlow()
+
     init {
         _workers.value = listOf(
             Worker(
@@ -41,5 +44,14 @@ class MainViewModel : ViewModel() {
 
     fun toggleLanguage() {
         _currentLanguage.value = if (_currentLanguage.value == "en") "kn" else "en"
+    }
+
+    fun toggleFavorite(workerId: String) {
+        val currentFavorites = _favoriteWorkerIds.value
+        _favoriteWorkerIds.value = if (currentFavorites.contains(workerId)) {
+            currentFavorites - workerId
+        } else {
+            currentFavorites + workerId
+        }
     }
 }

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.example.kaushalyakarnataka.ui.home.HomeScreen
 import com.example.kaushalyakarnataka.ui.profile.ProfileScreen
 import com.example.kaushalyakarnataka.ui.registration.RegistrationScreen
+import com.example.kaushalyakarnataka.ui.settings.SettingsScreen
 import com.example.kaushalyakarnataka.ui.viewmodel.MainViewModel
 
 @Composable
@@ -17,16 +18,20 @@ fun NavGraph(navController: NavHostController) {
     val viewModel: MainViewModel = viewModel()
     val workers by viewModel.workers.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val favoriteWorkerIds by viewModel.favoriteWorkerIds.collectAsState()
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreen(
                 workers = workers.filter { it.name.contains(searchQuery, ignoreCase = true) || it.role.contains(searchQuery, ignoreCase = true) },
                 searchQuery = searchQuery,
+                favoriteWorkerIds = favoriteWorkerIds,
                 onSearchQueryChange = { viewModel.updateSearchQuery(it) },
                 onWorkerClick = { worker -> navController.navigate("profile/${worker.id}") },
                 onToggleLanguage = { viewModel.toggleLanguage() },
-                onRegisterClick = { navController.navigate("registration") }
+                onRegisterClick = { navController.navigate("registration") },
+                onSettingsClick = { navController.navigate("settings") },
+                onToggleFavorite = { viewModel.toggleFavorite(it) }
             )
         }
         composable("profile/{workerId}") { backStackEntry ->
@@ -35,12 +40,17 @@ fun NavGraph(navController: NavHostController) {
             worker?.let {
                 ProfileScreen(
                     worker = it,
-                    onBackClick = { navController.popBackStack() }
+                    isFavorite = favoriteWorkerIds.contains(it.id),
+                    onBackClick = { navController.popBackStack() },
+                    onToggleFavorite = { viewModel.toggleFavorite(it.id) }
                 )
             }
         }
         composable("registration") {
             RegistrationScreen(onBackClick = { navController.popBackStack() })
+        }
+        composable("settings") {
+            SettingsScreen(onBackClick = { navController.popBackStack() })
         }
     }
 }

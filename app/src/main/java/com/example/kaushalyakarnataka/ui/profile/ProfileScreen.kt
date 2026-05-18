@@ -33,11 +33,39 @@ import com.example.kaushalyakarnataka.ui.theme.KaushalyaKarnatakaTheme
 @Composable
 fun ProfileScreen(
     worker: Worker,
+    isFavorite: Boolean,
     onBackClick: () -> Unit,
+    onToggleFavorite: () -> Unit
 ) {
     val context = LocalContext.current
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "Check out this worker: ${worker.name}, ${worker.role}. Contact: ${worker.phone}")
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    }) {
+                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        },
         bottomBar = {
             Button(
                 onClick = {
@@ -62,7 +90,7 @@ fun ProfileScreen(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             item {
-                ProfileHeader(worker, onBackClick)
+                ProfileHeader(worker, isFavorite, onToggleFavorite)
             }
             item {
                 StatsSection(worker)
@@ -84,16 +112,13 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(worker: Worker, onBackClick: () -> Unit) {
+fun ProfileHeader(worker: Worker, isFavorite: Boolean, onToggleFavorite: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(180.dp)
             .background(MaterialTheme.colorScheme.primary)
     ) {
-        IconButton(onClick = onBackClick, modifier = Modifier.padding(16.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-        }
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -113,11 +138,21 @@ fun ProfileHeader(worker: Worker, onBackClick: () -> Unit) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = worker.name, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = worker.name, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = if (isFavorite) Color.Red else Color.White
+                    )
+                }
+            }
             Text(text = stringResource(R.string.professional_service), color = Color.White.copy(alpha = 0.8f))
         }
     }
 }
+
 
 @Composable
 fun StatsSection(worker: Worker) {
@@ -209,7 +244,9 @@ fun ProfileScreenPreview() {
                     Review("1", "Suresh", "12 May 2026", 5, "Excellent work!")
                 )
             ),
-            onBackClick = {}
+            isFavorite = false,
+            onBackClick = {},
+            onToggleFavorite = {}
         )
     }
 }
