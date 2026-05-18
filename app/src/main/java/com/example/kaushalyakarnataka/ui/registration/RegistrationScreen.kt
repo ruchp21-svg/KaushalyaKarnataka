@@ -88,4 +88,4 @@ fun RegistrationField(label: String, value: String, onValueChange: (String) -> U
     }
 }
 
-private fun Modifier.drawBehindBorder() = this.padding(bottom = 1.dp).background(BorderLight).padding(bottom = (-1).dp)
+private fun Modifier.drawBehindBorder() = this.background(BorderLight)

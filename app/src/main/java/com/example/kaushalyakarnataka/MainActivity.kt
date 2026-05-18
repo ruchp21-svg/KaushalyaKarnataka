@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -25,7 +26,9 @@ class MainActivity : ComponentActivity() {
             val viewModel: MainViewModel = viewModel()
             val language by viewModel.currentLanguage.collectAsState()
             
-            updateLocale(language)
+            LaunchedEffect(language) {
+                updateLocale(language)
+            }
 
             KaushalyaKarnatakaTheme {
                 Surface(

@@ -256,5 +256,5 @@ fun WorkerCard(
     }
 }
 
-fun Modifier.drawBehindBorder() = this.padding(bottom = 1.dp).background(BorderLight).padding(bottom = (-1).dp)
-fun Modifier.drawTopBorder() = this.padding(top = 1.dp).background(BorderLight).padding(top = (-1).dp)
+fun Modifier.drawBehindBorder() = this.background(BorderLight)
+fun Modifier.drawTopBorder() = this.background(BorderLight)
