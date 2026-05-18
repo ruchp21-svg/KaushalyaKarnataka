@@ -1,30 +1,69 @@
 package com.example.kaushalyakarnataka.ui.profile
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.kaushalyakarnataka.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
+    var userName by remember { mutableStateOf("Ruchitha P") }
+    var userEmail by remember { mutableStateOf("ruchp21@example.com") }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+    var isEditing by remember { mutableStateOf(false) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        profileImageUri = uri
+        if (uri != null) {
+            Toast.makeText(context, "Profile picture updated locally!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    if (isEditing) {
+        EditProfileDialog(
+            currentName = userName,
+            currentEmail = userEmail,
+            onDismiss = { isEditing = false },
+            onSave = { newName, newEmail ->
+                userName = newName
+                userEmail = newEmail
+                isEditing = false
+                Toast.makeText(context, "Profile updated!", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -47,7 +86,7 @@ fun UserProfileScreen(onBackClick: () -> Unit) {
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Profile Card
+            // Profile Card with Image Upload
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -60,23 +99,50 @@ fun UserProfileScreen(onBackClick: () -> Unit) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(120.dp)
                             .clip(CircleShape)
-                            .background(AccentOrangeLight),
+                            .background(AccentOrangeLight)
+                            .clickable { photoPickerLauncher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(56.dp),
-                            tint = PrimaryOrange
-                        )
+                        if (profileImageUri != null) {
+                            AsyncImage(
+                                model = profileImageUri,
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                                modifier = Modifier.size(60.dp),
+                                tint = PrimaryOrange
+                            )
+                        }
+                        
+                        // Overlaid Camera Icon
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(32.dp)
+                                .background(PrimaryOrange, CircleShape)
+                                .border(2.dp, Color.White, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.CameraAlt,
+                                contentDescription = "Change Picture",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                     
                     Spacer(modifier = Modifier.height(20.dp))
                     
-                    Text(text = "Ruchitha P", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    Text(text = "ruchp21@example.com", fontSize = 14.sp, color = TextSecondary)
+                    Text(text = userName, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text(text = userEmail, fontSize = 14.sp, color = TextSecondary)
                 }
             }
             
@@ -90,16 +156,28 @@ fun UserProfileScreen(onBackClick: () -> Unit) {
                 modifier = Modifier.align(Alignment.Start).padding(start = 8.dp, bottom = 12.dp)
             )
             
-            ProfileOptionItem(icon = Icons.Default.Edit, title = "Edit Personal Info")
+            ProfileOptionItem(
+                icon = Icons.Default.Edit, 
+                title = "Edit Personal Info",
+                onClick = { isEditing = true }
+            )
             Spacer(modifier = Modifier.height(12.dp))
-            ProfileOptionItem(icon = Icons.Default.Star, title = "My Favorites")
+            ProfileOptionItem(
+                icon = Icons.Default.Star, 
+                title = "My Favorites",
+                onClick = { Toast.makeText(context, "Favorites clicked", Toast.LENGTH_SHORT).show() }
+            )
             Spacer(modifier = Modifier.height(12.dp))
-            ProfileOptionItem(icon = Icons.Default.Settings, title = "App Preferences")
+            ProfileOptionItem(
+                icon = Icons.Default.Settings, 
+                title = "App Preferences",
+                onClick = { Toast.makeText(context, "Preferences clicked", Toast.LENGTH_SHORT).show() }
+            )
             
             Spacer(modifier = Modifier.weight(1f))
             
             Button(
-                onClick = { /* Logout logic */ },
+                onClick = { onBackClick() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -114,9 +192,72 @@ fun UserProfileScreen(onBackClick: () -> Unit) {
 }
 
 @Composable
-fun ProfileOptionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String) {
+fun EditProfileDialog(
+    currentName: String,
+    currentEmail: String,
+    onDismiss: () -> Unit,
+    onSave: (String, String) -> Unit
+) {
+    var name by remember { mutableStateOf(currentName) }
+    var email by remember { mutableStateOf(currentEmail) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Profile", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryOrange,
+                        focusedLabelColor = PrimaryOrange,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary
+                    )
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryOrange,
+                        focusedLabelColor = PrimaryOrange,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onSave(name, email) },
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryOrange)
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = TextSecondary)
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(16.dp)
+    )
+}
+
+@Composable
+fun ProfileOptionItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector, 
+    title: String,
+    onClick: () -> Unit
+) {
     Surface(
-        onClick = { /* Navigation */ },
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         color = SurfaceWhite,
         shape = RoundedCornerShape(16.dp),
